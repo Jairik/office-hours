@@ -1,0 +1,16 @@
+# Project TODOs
+- [X] Change highlights to dark green
+- [ ] Add schedule to calender
+- [ ] Change from skeleton military to AM/PM Time
+- [X] Integrate list into dropdown
+- [X] Add "UPDATE" tab on top
+- [ ] Change font
+- [ ] Fix contact div - dragging input field has weird behavior
+- [ ] *Add resources tab*
+- [X] Update README, briefly
+- [ ] Add link to github project somewhere, footer probably
+- [ ] Refactor contact form - straight sending email vs opening up email 
+
+
+# Final:
+- [ ] Deploy using Github Pages

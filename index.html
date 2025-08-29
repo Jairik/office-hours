@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>JJ's Tutoring Schedule</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <header>
+        <h1>JJ's Office Hours - Fall Semester 2025</h1>
+        <button class="toggle-btn" id="themeToggle">Toggle Dark/Light</button>
+    </header>
+
+    <div class="alert-banner">
+        <span style="font-size: 1.5rem; margin-right: 10px;">⚠️</span>
+        <span>Note: Office hours are subject to change. Please check back for any week-to-week updates.</span>
+    </div>
+
+    <section id="schedule">
+        <div class="schedule-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                        <th>Sunday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>08:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>09:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>11:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>14:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h4>Can't make office hours?</h4>
+        <h2>Ask a question</h2>
+        <form id="contactForm">
+            <label>
+                Your Name:
+                <input type="text" id="name" required />
+            </label>
+            <label>
+                Your Email:
+                <input type="email" id="email" required />
+            </label>
+            <label>
+                Select Course:
+                <select id="classSelect" required>
+                    <!-- Will be filled dynamically with js -->
+                </select>
+            </label>
+            <label>
+                Message:
+                <textarea id="message" rows="4" placeholder="Your message..." required></textarea>
+            </label>
+            <button type="submit">Send</button>
+            <div id="formResponse"></div>
+        </form>
+    </section>
+
+    <footer>
+        Jairik 'JJ' McCauley | Senior Computer Science/Data Science Student | Focuses in AI, Software Engineering | jmccauley4@gulls.salisbury.edu
+    </footer>
+
+    <!-- Handle changing the theme-->
+    <script type="module">
+        import * as utils from './main.js'
+        utils.setupThemeToggle();
+        utils.populateClassList();
+        utils.setupSendEmail();
+    </script>
+</body>
+</html>

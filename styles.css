@@ -1,0 +1,148 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --accent-color: #5D1725;
+    --card-bg: #f5f5f5;
+    --input-bg: #ffffff;
+    --input-border: #cccccc;
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --text-color: #ffffff;
+    --accent-color: #5D1725;
+    --card-bg: #1f1f1f;
+    --input-bg: #1e1e1e;
+    --input-border: #333333;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
+    padding: 1rem;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.contact-info {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--input-border);
+}
+
+.toggle-btn {
+    background: var(--card-bg);
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    color: var(--text-color);
+}
+
+h1, h2 {
+    margin-bottom: 1rem;
+}
+
+.schedule-container {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+}
+
+th, td {
+    border: 1px solid var(--input-border);
+    padding: 0.75rem;
+    text-align: center;
+}
+
+th {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+form {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 4px;
+    max-width: 400px;
+    margin-bottom: 2rem;
+}
+
+form label {
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+form input[type="text"],
+form select,
+form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+form input[type="email"],
+form select,
+form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+form button {
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+#formResponse {
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+footer {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--input-border);
+    margin-top: 2rem;
+}
+
+.alert-banner {
+    background-color: #fff3cd; 
+    color: #856404; 
+    padding: 10px; 
+    border: 1px solid #ffeeba; 
+    border-radius: 5px; 
+    margin: 10px 0; 
+    display: flex; 
+    align-items: center;
+}
