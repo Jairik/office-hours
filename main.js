@@ -8,17 +8,17 @@ export function setupSendEmail(){
         e.preventDefault();
         // Extract the values
         const name = document.getElementById('name').value.trim();
-        const cls  = document.getElementById('classSelect').value;
-        const msg  = document.getElementById('message').value.trim();
+        const course = document.getElementById('classSelect').value;
+        const msg = document.getElementById('message').value.trim();
         // Add it to an email message
         const body = encodeURIComponent(
-            `Name: ${name}\nClass: ${cls}\nMessage:\n${msg}`
+            `Name: ${name}\nCourse: ${course}\nMessage:\n${msg}`
         );
         // Open the default email sender thing
-        window.location.href = `mailto:jmccauley4@gulls.salisbury.edu?subject=Contact Form Submission&body=${body}`;
+        window.location.href = `mailto:jmccauley4@gulls.salisbury.edu?subject=Tutoring Contact Form Submission - ${name}&body=${body}`;
         // Update with a success message
         document.getElementById('formResponse').textContent = 
-            `Thank you, ${name}. Your message has been opened in your email client.`;
+            `Thank you for reaching out ${name}! Your message has been opened in your email client, feel free to send it as-is and I will get back to you asap.`;
         this.reset();  // Reset all of the values
     });
 }

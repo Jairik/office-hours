@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <!-- Everything Else -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>JJ's Tutoring Schedule</title>
@@ -8,15 +13,21 @@
 </head>
 <body>
     <header>
-        <h1>JJ's Office Hours - Fall Semester 2025</h1>
+        <h1>JJ's Office Hours - Fall '25 </h1>
+        <img 
+            src="https://cdn.shopify.com/s/files/1/0646/4664/3925/collections/Salisbury_University.png?v=1726591248" 
+            alt="Salisbury University Logo" 
+            style="width: 69px; height: 69px; vertical-align: middle; background-color: transparent;"
+        >
         <button class="toggle-btn" id="themeToggle">Toggle Dark/Light</button>
     </header>
 
     <div class="alert-banner">
         <span style="font-size: 1.5rem; margin-right: 10px;">⚠️</span>
-        <span>Note: Office hours are subject to change. Please check back for any week-to-week updates.</span>
+        <span>Note: I may have to occasionally change office hours due to scheduling conflicts. Feel free to check back for any week-to-week updates.</span>
     </div>
 
+    <h3>Office Hours are still being finalized, they will be updated here as soon as they are set!</h3>
     <section id="schedule">
         <div class="schedule-container">
             <table>
@@ -33,23 +44,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>08:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td>09:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td>10:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td>11:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td>12:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td>13:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td>14:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td>15:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr><td>16:00</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>8:00am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>9:00am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>10:00am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>11:00am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>12:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>1:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>2:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>3:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>4:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>5:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>6:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>7:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>8:00pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                 </tbody>
             </table>
         </div>
     </section>
 
-    <section id="contact">
+    <section id="contact" class="contact-form">
         <h4>Can't make office hours?</h4>
-        <h2>Ask a question</h2>
+        <h2>Contact me:</h2>
         <form id="contactForm">
             <label>
                 Your Name:
@@ -67,15 +82,53 @@
             </label>
             <label>
                 Message:
-                <textarea id="message" rows="4" placeholder="Your message..." required></textarea>
+                <textarea id="message" rows="5" placeholder="Your message..." required></textarea>
             </label>
             <button type="submit">Send</button>
             <div id="formResponse"></div>
         </form>
     </section>
 
+    <section id="resouces" class="resources">
+        <h3 class="resources-header">Cool Resources</h3>
+        <div class="resource-list">
+            <ul>
+                <!-- Computer Science Department 2-year plan -->
+                <li>
+                    <a href="https://www.salisbury.edu/academic-offices/science-and-technology/computer-science/_files/cs-two-Year-plan.pdf?v=20250822215154" 
+                        target="_blank">
+                            COSC Department 2-year plan for course offerings
+                    </a>
+                </li>
+                <li>
+                    <a href="https://salisburyanalytics.com/" 
+                        target="_blank">
+                            Salisbury Analytics - Created by SU Alumni, similar to PlanetTerp from UMD
+                    </a>
+                </li>
+                <li>
+                    <a href="https://education.github.com/" 
+                        target="_blank">
+                            GitHub Student Developer Pack - Free access to developer tools and resources
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.youtube.com/c/Fireship" 
+                        target="_blank">
+                            Fireship Youtube Channel - Short-format tutorials and tech updates
+                    </a>
+                </li>
+            </ul>
+        </div>
+
     <footer>
-        Jairik 'JJ' McCauley | Senior Computer Science/Data Science Student | Focuses in AI, Software Engineering | jmccauley4@gulls.salisbury.edu
+        Jairik 'JJ' McCauley | Senior Computer Science/Data Science Student | Focuses in AI, Software Engineering | jmccauley4@gulls.salisbury.edu | 
+        <a href="https://github.com/Jairik/office-hours" target="_blank" style="text-decoration: none;">
+            <img 
+                src="https://static.vecteezy.com/system/resources/previews/046/437/248/non_2x/github-logo-transparent-background-free-png.png" 
+                alt="GitHub" style="width: 30px; height: 30px; vertical-align: middle; background-color: transparent;"
+            >
+        </a>
     </footer>
 
     <!-- Handle changing the theme-->
