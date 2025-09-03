@@ -1,5 +1,5 @@
-/* Main functionalities for the website */
-import { getClassList } from './class-list.js'  // Getter for static class-list
+/* Scripts for the site - handles main functionalities */
+import { getClassList } from './misc/class-list.js'  // Getter for static class-list
 
 /** Send the message on the contact form */
 export function setupSendEmail(){

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSL Setup</title>
+    <!-- Font Setup-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <!-- Adding WSL Demo Icon -->
+    <link rel="icon" type="image/png" href="misc/images/Ubuntu-Terminal-Demo.png"/> 
+    <!-- Stylesheet + custom styling for this page - TODO refactor later -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        body.light-mode {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        
+        .toggle-button {
+            cursor: pointer;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0078d4;
+            color: #ffffff;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body class="dark-mode">
+
+    <a href="index.html" class="back-button" style="display: inline-block; margin: 10px 0; text-decoration: none; color: #5D1725; font-size: 16px;">&larr; Back</a>
+    
+    <div class="toggle-container">
+        <button class="toggle-btn" id="themeToggle">Toggle Dark/Light</button>
+    </div>
+    <header>
+        <h1>WSL Setup Guide</h1>
+    </header>
+
+    <div class="image-container" style="text-align: center; margin: 20px 0;">
+        <img src="misc/images/Ubuntu-Terminal-Demo.png" alt="WSL Terminal Demo" style="max-width: 100%; height: auto; border: 1px solid grey; border-radius: 5px;">
+    </div>
+
+    <main>
+        <!-- Intro header and whatnot-->
+        <section>
+            <h2><u>Introduction</u></h2>
+            <p>Welcome to the WSL setup guide. Follow the steps below to download & install WSL to access the Linux kernel (Ubuntu) from your Windows machine.</p>
+        </section>
+        <section>
+            
+            <h2><u>Steps</u></h2>
+            <p>Follow the following steps, in order.</p>
+            
+            <div class="padding"></div>
+            <h3>1) Open Powershell as Administrator</h3>
+            <p>Either: ⊞ + r -> type powershell OR ⊞ -> "powershell" -> left click -> open as administrator.</p>
+            
+            <div class="padding"></div>
+            <h3>2) Run the install command</h3>
+            <p>In the Powershell window, type the following command and hit enter:</p>
+            <pre><code>wsl --install</code></pre>
+            <p>This will download and install WSL, the Linux kernel, and the Ubuntu distribution, assuming it has administrator privaledges</p>
+
+            <div class="padding"></div>
+            <h4>2.5) Optional but Recommended: Turn on Virtual Machine Platform and WSL in Settings</h4>
+            <p>Although the above command <em>should</em> change these settigns after rebooting, it doesn't hurt do it manually as well.</p>
+            <p>We will be opening the "Turn Windows features on or off" settings. To do this, ⊞ -> "turn windows features on or off" -> Enter.</p>
+            <p>In this window, scroll down to "Virtual Machine Platform" and "Windows Subsystem for Linux". Ensure that these are checked, then click OK.</p>
+
+            <div class="padding"></div>
+            <h3>3) Restart your computer, as prompted</h3>
+            <p>You should be prompted to restart your computer. This will allow for everything to be configured during reboot.</p>
+
+            <div class="padding"></div>
+            <h3>4) Open up Ubuntu Terminal + set up your Linux username and password</h3>
+            <p>After your computer restarts, open up the terminal and type "ubuntu". You should be prompted to create a Linux username and password. This is separate from your Windows username and password. You will use this username and password when using the Ubuntu terminal.</p>
+
+            <div class="padding"></div>
+            <h2><u>Video Demo(s)</u></h2>
+            <p>If the above methods does not work, try this alternative method:</p>
+            <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube-nocookie.com/embed/J8cy6MDkacI"
+                title="YouTube video"
+                frameborder="0"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
+
+            <p>For a slightly more in depth tutorial, you can also try <a href="https://www.youtube.com/watch?v=zZf4YH4WiZo" target="_blank" style="text-decoration: none;">this video</a>.</p>
+
+            <div class="padding"></div>
+            <h2><u>Customizing your WSL Terminal</u></h2>
+            <p>Although not necessary, the WSL terminal offers some visual customizations out of the box to make the experience alot more enjoyable. To see a poor demo I did, check out this video:</p>
+            <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube-nocookie.com/embed/qF2upx-8A5I"
+                title="YouTube video"
+                frameborder="0"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
+
+        </section>
+
+        <div class="padding"></div>
+        <h2><u>Troubleshooting</u></h2>
+        <p>Sometimes, WSL can just be a little weird installing. Some basic fixes may involve restarting computer, retrying the command as an administrator, and/or installing the Ubuntu app from the microsoft store.</p>
+        <p>If you are still having issues, please reach out to me from the main site or my contact info or however you like, it doesn't matter to me. Thank you!</p>
+        
+    </main>
+
+    <footer>
+        Jairik 'JJ' McCauley | Senior Computer Science/Data Science Student | Focuses in AI, Software Engineering | jmccauley4@gulls.salisbury.edu | 
+        <a href="https://github.com/Jairik/office-hours" target="_blank" style="text-decoration: none;">
+            <img 
+                src="https://static.vecteezy.com/system/resources/previews/046/437/248/non_2x/github-logo-transparent-background-free-png.png" 
+                alt="GitHub" style="width: 30px; height: 30px; vertical-align: middle; background-color: transparent;"
+            >
+        </a>
+    </footer>
+
+    <!-- Running the scripts theme toggle -->
+    <script type="module">
+        import setupThemeToggle from './main.js'
+        setupThemeToggle();
+    </script>
+</body>
+</html>

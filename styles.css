@@ -1,3 +1,4 @@
+/* styles.css - sitewide styling */
 :root {
     --bg-color: #ffffff;
     --text-color: #000000;
@@ -65,6 +66,12 @@ header {
     cursor: pointer;
     border-radius: 4px;
     color: var(--text-color);
+}
+
+.toggle-container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
 }
 
 h1, h2 {
@@ -173,4 +180,8 @@ footer {
 .resource-list{
     list-style-type: disc;
     padding-left: 1rem;
+}
+
+.padding{
+    padding: 10px;
 }

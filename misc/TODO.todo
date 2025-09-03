@@ -8,6 +8,11 @@
 - [X] Add resources section - Will add more as I think of them
 - [X] Update README, briefly
 - [X] Add link to github project somewhere, footer probably
+- [] Fix dark/light mode toggle on WSL-Setup Page (and fix some formatting, such as font and add demo picture to top)
 
 # Once Finalized:
 - [ ] Add schedule to calender
+        -> [ ] Update README with finalized website screenshot
+
+# Deployment
+- [X] Deploy via Github Pages
