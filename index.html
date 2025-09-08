@@ -15,12 +15,15 @@
 </head>
 <body>
     <header>
+        <!-- Main title thing -->
         <h1>JJ's Office Hours - Fall '25 </h1>
-        <img 
+        <!-- Sammy Logo-->
+        <img
             src="https://cdn.shopify.com/s/files/1/0646/4664/3925/collections/Salisbury_University.png?v=1726591248" 
             alt="Salisbury University Logo" 
             style="width: 69px; height: 69px; vertical-align: middle; background-color: transparent;"
         >
+        <!-- Theme toggling button -->
         <button class="toggle-btn" id="themeToggle">Toggle Dark/Light</button>
     </header>
 
@@ -31,7 +34,7 @@
 
     <h2>Tentative Office Hours Only - May be subject to change</h2>
     <section id="schedule">
-        <div class="schedule-container">
+        <div class="schedule-container" id="scheduleDiv">
             <!-- To be populated by schedule.js -->
         </div>
     </section>
@@ -111,12 +114,13 @@
         </a>
     </footer>
 
-    <!-- Handle changing the theme-->
+    <!-- Scripts for element handlers -->
     <script type="module">
         import * as utils from './main.js'
-        utils.setupThemeToggle();
-        utils.populateClassList();
-        utils.setupSendEmail();
+        utils.setupSchedule();  // Setup the schedule
+        utils.setupThemeToggle();  // Setup the theme toggle button
+        utils.populateClassList();  // Populate the class list in the contact form
+        utils.setupSendEmail();  // Setup the contact form
     </script>
 </body>
 </html>

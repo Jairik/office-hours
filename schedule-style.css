@@ -1,21 +1,27 @@
-/* Style for the schedule calender */
-/* Default theme - light mode */
+/* schedule-style.css
+   Styles scoped to the Shadow DOM host (the element with id="scheduleDiv")
+   Variables define the theme; dark mode uses :host([data-theme="dark"])
+*/
+
+/* ---------- Theme variables (Light) ---------- */
 :host {
-  --hour-height: 64px;
+  --hour-height: 64px;                  /* height for 60 minutes */
   --half-hour-height: calc(var(--hour-height) / 2);
+  --time-col-width: 72px;               /* width of the time axis column */
   --grid-border: #e5e7eb;
   --bg: #ffffff;
   --text: #111827;
   --muted: #6b7280;
-  --primary: #5d1725;
-  --block-bg: rgba(93, 23, 37, 0.12); /* maroon with 12% */
-  --block-border: rgba(93, 23, 37, 0.45); /* maroon with 45% */
+  --primary: #5D1725;                   /* maroon line for "now" */
+  --block-bg: rgba(93, 23, 37, 0.12);   /* maroon tint */
+  --block-border: rgba(93, 23, 37, 0.45);
   --tooltip-bg: #111827;
   --tooltip-text: #f9fafb;
 }
 
-/* Dark overrides when the host is dark theme */
-:host([data-theme="dark"]) {
+/* ---------- Dark theme overrides ---------- */
+ :host([data-theme="dark"]),
+ :host-context([data-theme="dark"]) {
   --bg: #0b0b0c;
   --text: #e7e7ea;
   --muted: #a0a3a8;
@@ -27,38 +33,34 @@
   --tooltip-text: #f2f4f6;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  color: var(--text);
-  font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
-    "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-}
+/* ---------- Layout ---------- */
 
 .calendar {
   max-width: 1100px;
   margin: 24px auto;
   padding: 0 12px 24px;
+  color: var(--text);
+  background: var(--bg);
 }
 
 .cal-header {
   display: grid;
-  grid-template-columns: 72px repeat(7, 1fr);
+  grid-template-columns: var(--time-col-width) repeat(7, 1fr);
   align-items: end;
   gap: 0;
   position: sticky;
   top: 0;
   z-index: 5;
+  background: var(--bg);
   border-bottom: 1px solid var(--grid-border);
   padding: 10px 0;
 }
+
 .cal-header .day {
   text-align: center;
   font-weight: 600;
 }
+
 .cal-header .day small {
   display: block;
   color: var(--muted);
@@ -66,55 +68,69 @@ body {
   margin-top: 2px;
 }
 
-.cal-grid {
-  display: grid;
-  grid-template-columns: 72px repeat(7, 1fr);
-  position: relative;
+.scroll-wrap {
+  overflow-x: auto;
+  border-bottom: 1px solid var(--grid-border);
 }
 
-/* Time axis (left column) */
+.cal-grid {
+  display: grid;
+  grid-template-columns: var(--time-col-width) repeat(7, 1fr);
+  position: relative; /* containing block for the "now" line */
+}
+
+/* ---------- Time axis ---------- */
+
 .time-col {
   border-right: 1px solid var(--grid-border);
 }
+
 .time-slot {
   height: var(--half-hour-height);
   padding-right: 8px;
   text-align: right;
   color: var(--muted);
   font-size: 12px;
+  position: relative; /* position labels inside the row */
 }
-.time-slot:nth-child(odd) {
-  /* label only on the hour rows */
-  position: relative;
-}
+
+/* Hour labels on the top edge of each hour row (i.e., every odd 30-min row) */
 .time-slot:nth-child(odd)::after {
   content: attr(data-time);
   position: absolute;
   right: 8px;
-  top: calc(50% - 0.5em);
+  top: 0;                   /* anchor to top border of the row */
+  transform: translateY(-50%); /* sit on the hour line */
 }
 
-/* Day columns */
+/* Hide the first label to avoid crowding the top border */
+.time-slot:first-child::after {
+  content: none;
+}
+
+/* ---------- Day columns ---------- */
+
 .day-col {
-  position: relative; /* required for absolutely positions blocks */
+  position: relative; /* containing block for .block items */
   border-right: 1px solid var(--grid-border);
   min-height: 100%;
 }
+
 .day-col:last-child {
   border-right: none;
 }
 
-/* Horizontal half-hour lines */
+/* Half-hour separators */
 .day-col .slot {
   height: var(--half-hour-height);
   border-bottom: 1px solid var(--grid-border);
 }
 .day-col .slot:nth-child(odd) {
-  /* on the hour a bit darker */
-  border-bottom-color: #8c8f93;
+  border-bottom-color: #8c8f93; /* slightly darker on the hour */
 }
 
-/* Blocks */
+/* ---------- Event Blocks ---------- */
+
 .block {
   position: absolute;
   left: 6px;
@@ -127,23 +143,27 @@ body {
   cursor: default;
   transition: box-shadow 120ms ease, transform 120ms ease;
 }
+
 .block:hover {
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
+
 .block .title {
   font-weight: 600;
   font-size: 13px;
   margin-bottom: 2px;
-  color: #5d1725;
+  color: var(--primary);
   font-style: italic;
 }
+
 .block .time {
   font-size: 12px;
   color: var(--muted);
 }
 
-/* Tooltip on hover */
+/* ---------- Tooltip ---------- */
+
 .block[data-tip]:hover::after {
   content: attr(data-tip);
   position: absolute;
@@ -160,6 +180,7 @@ body {
   pointer-events: none;
   z-index: 10;
 }
+
 .block[data-tip]:hover::before {
   content: "";
   position: absolute;
@@ -172,46 +193,23 @@ body {
   z-index: 10;
 }
 
-/* Today highlight */
+/* ---------- Today highlight & Now line ---------- */
+
 .day-col.is-today .slot {
-  background-image: linear-gradient(
-    to bottom,
-    rgba(93, 23, 37, 0.06),
-    rgba(93, 23, 37, 0.06)
-  );
+  background-image: linear-gradient(to bottom, rgba(93, 23, 37, 0.06), rgba(93, 23, 37, 0.06));
   background-size: 100% var(--half-hour-height);
   background-repeat: no-repeat;
   background-position-y: calc((var(--now-offset, 0)) * 1px);
 }
+
 .today-banner {
   position: absolute;
   top: 0;
-  left: 72px;
-  right: 0;
+  left: 0;               /* JS sets left and width */
+  width: 0;
   height: 2px;
   background: var(--primary);
-  transform: translateY(var(--now-y, -9999px));
+  transform: translateY(var(--now-y, -9999px)); /* JS sets --now-y */
   z-index: 3;
-}
-
-/* Small screens: allow horizontal scroll */
-.scroll-wrap {
-  overflow-x: auto;
-  border-bottom: 1px solid var(--grid-border);
-}
-
-.legend {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin: 12px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-.legend .swatch {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  background: var(--block-bg);
-  border: 1px solid var(--block-border);
+  pointer-events: none;
 }

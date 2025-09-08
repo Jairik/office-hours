@@ -1,238 +1,273 @@
-/* Scripts for updating the current schedule, from the weekly schedule viewer */
+// schedule.js
+// Vanilla JS weekly calendar rendered inside a Shadow DOM.
+// - Waits for CSS to load before measuring custom properties
+// - Positions blocks absolutely inside day columns
+// - Draws a "now" line that sits inside today's column
+// - Supports light/dark by reading data-theme on the host
 
-/* Basic configuration files - these will be updated on schedule changes */
-// Available office hours
+/* ---------- Configuration (you can replace/override as needed) ---------- */
+
+// Example office hours. With weekStartsOn=1 (Mon), use Monday=0 .. Sunday=6.
 const officeHours = [
-    {day: 1, start: "17:30", end: "19:30", title: "Office Hours", tip:"TETC111"},  // Monday 5:30pm-7:30pm
-    {day: 2, start: "9:15", end: "10:15", title: "Office Hours", tip:"TETC111"},  // Tuesday 9:15am-10:15am
-    {day: 5, start: "14:00", end: "15:00", title: "Office Hours", tip:"TETC111"},  // Friday 2:00pm-3:00pm
-    {day: 4, start: "9:15", end: "10:15", title: "Office Hours", tip:"TETC111"}  // Thursday 9:15am-10:15am
+  { day: 0, start: "17:30", end: "19:30", title: "Office Hours", tip: "TETC111" }, // Mon
+  { day: 1, start: "09:15", end: "10:15", title: "Office Hours", tip: "TETC111" }, // Tue
+  { day: 3, start: "09:15", end: "10:15", title: "Office Hours", tip: "TETC111" }, // Thu
+  { day: 4, start: "14:00", end: "15:00", title: "Office Hours", tip: "TETC111" }, // Fri
 ];
 
-// Configurations for the calender
+// Calendar config
 const config = {
-    // Time configs, in military time
-    startHour: 8,
-    endHour: 20,
-    weekStartsOn: 1,  // Start the week on Monday
-    blocks: officeHours
+  startHour: 8,   // visible window (24h)
+  endHour: 20,
+  weekStartsOn: 1, // 1 = Monday
+  blocks: officeHours,
 };
 
-/* Scheduling element logic */
+/* ------------------------- Utility functions ------------------------- */
 
-const DAY_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// Helper function to determine start of the week
-function startOfWeek(date, weekStartsOn = 0){
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = (day - weekStartsOn + 7) % 7;
-    d.setDate(d.getDate() - diff);
-    d.setHours(0,0,0,0);
-    return d;
-    }
-
-// Helper function to determine day
-function addDays(date, n){
-    const d = new Date(date);
-    d.setDate(d.getDate()+n);
-    return d;
+function startOfWeek(date, weekStartsOn = 0) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = (day - weekStartsOn + 7) % 7;
+  d.setDate(d.getDate() - diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
-// Helper function to convert time to minutes
-function timeToMinutes(curTime){
-    const [h,m] = time.split(":").map(Number);
-    return h * 60 + m;
+function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
 }
 
-// Helper function to pad times with 0
-function pad2(n){
-    return n.toString().padStart(2, '0');
+function timeToMinutes(curTime) {
+  const [h, m] = curTime.split(":").map(Number);
+  return h * 60 + m;
 }
 
-// Helper function to convert minutes time into 12-hour time
-function minsToLabel(mins){
-    const h = Math.floor(mins/60), m = mins%60;
-    const p = h>=12 ? "pm" : "am";
-    const hh = ((h+11)%12)+1;
-    return `${hh}${m?":"+pad2(m):""}${p}`
+function pad2(n) {
+  return n.toString().padStart(2, "0");
 }
 
-// Helper function to get the current time in EST
+function minsToLabel(mins) {
+  const h = Math.floor(mins / 60), m = mins % 60;
+  const p = h >= 12 ? "pm" : "am";
+  const hh = ((h + 11) % 12) + 1;
+  return `${hh}${m ? ":" + pad2(m) : ""}${p}`;
+}
+
+// Always compute "now" in Eastern time
 function getEasternTime() {
-    const estString = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
-    return new Date(estString);
+  const estString = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+  return new Date(estString);
 }
 
-// Helper function to render the headers of the given div
-function renderHeader(container, startDate){
-    const empty = document.createElement("div");  // First empty cell
-    container.appendChild(empty);
-    // Make a cell for each day
-    for(let i = 0; i < DAY_NAMES.length; i++){
-        const d = addDays(startDate, i);
-        const day = document.createElement("div");
-        day.className = "day";
-        const md = `${d.getMonth()+1}/${d.getDate()}`;
-        day.innerHTML = `<small>${md}</small>`;
-        container.appendChild(day);
+/* --------------------------- Render pieces --------------------------- */
+
+function renderHeader(container, startDate) {
+  // Empty spacer cell over the time axis
+  const empty = document.createElement("div");
+  container.appendChild(empty);
+
+  // Day cells
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(startDate, i);
+    const day = document.createElement("div");
+    day.className = "day";
+    const md = `${d.getMonth() + 1}/${d.getDate()}`;
+    const dayName = DAY_NAMES[d.getDay()];
+    day.innerHTML = `${dayName}<small>${md}</small>`;
+    container.appendChild(day);
+  }
+}
+
+function renderGrid(grid, startDate, startHour, endHour) {
+  // Time column
+  const timeCol = document.createElement("div");
+  timeCol.className = "time-col";
+
+  const slots = (endHour - startHour) * 2; // half-hour rows
+  for (let i = 0; i < slots; i++) {
+    const row = document.createElement("div");
+    row.className = "time-slot";
+    if (i % 2 === 0) {
+      // label only on the hour rows
+      const totalMins = startHour * 60 + i * 30;
+      row.dataset.time = minsToLabel(totalMins);
     }
-}
+    timeCol.appendChild(row);
+  }
+  grid.appendChild(timeCol);
 
-// Helper function to render the grid
-function renderGrid(grid, startDate, startHour, endHour){
-    // Time column
-    const timeCol = document.createElement("div");
-    timeCol.className = "time-col";
-    const slots = (endHour - startHour) * 2; // half-hours
-    for(let i=0;i<slots;i++){
-        const row = document.createElement("div");
-        row.className = "time-slot";
-        if(i%2===0){ // on the hour
-        const totalMins = (startHour*60) + i*30;
-        row.dataset.time = minutesToLabel(totalMins);
-        }
-        timeCol.appendChild(row);
+  // Day columns
+  for (let col = 0; col < 7; col++) {
+    const dayCol = document.createElement("div");
+    dayCol.className = "day-col";
+
+    // Mark today for subtle background
+    const today = new Date();
+    const cellDate = addDays(startDate, col);
+    if (today.toDateString() === cellDate.toDateString()) {
+      dayCol.classList.add("is-today");
     }
-    grid.appendChild(timeCol);
 
-    // Day columns
-    for(let col=0; col<7; col++){
-        const dayCol = document.createElement("div");
-        dayCol.className = "day-col";
-        // Mark today
-        const today = new Date();
-        const cellDate = addDays(startDate, col);
-        if(today.toDateString() === cellDate.toDateString()){
-        dayCol.classList.add("is-today");
-        }
-        // Time slots
-        for(let i=0;i<slots;i++){
-        const s = document.createElement("div");
-        s.className = "slot";
-        dayCol.appendChild(s);
-        }
-        grid.appendChild(dayCol);
+    for (let i = 0; i < slots; i++) {
+      const s = document.createElement("div");
+      s.className = "slot";
+      dayCol.appendChild(s);
     }
+    grid.appendChild(dayCol);
+  }
 }
 
-// Helper function to place each timeslot
-function placeBlocks(grid, startHour){
-    const hourHeight = parseFloat(getComputedStyle(grid).getPropertyValue('--hour-height'));
-    const halfHourHeight = hourHeight/2;
+function placeBlocks(grid) {
+  const hourHeight = parseFloat(getComputedStyle(grid).getPropertyValue("--hour-height"));
+  const halfHourHeight = hourHeight / 2;
 
-    // Grab the day columns
-    const dayCols = Array.from(grid.querySelectorAll('.day-col'));
+  // select only the .day-col nodes (robust even if other children exist)
+  const dayCols = Array.from(grid.querySelectorAll(".day-col"));
 
-    // Place each block
-    config.blocks.forEach(b=>{
-        if(b.day<0 || b.day>6) return;
-        const col = dayCols[b.day];
-        const startM = timeToMinutes(b.start);
-        const endM   = timeToMinutes(b.end);
-        const relStart = Math.max(0, startM - (config.startHour*60));
-        const relEnd   = Math.max(0, endM   - (config.startHour*60));
-        const topPx = (relStart/30) * halfHourHeight;
-        const heightPx = Math.max(halfHourHeight/2, ((relEnd-relStart)/30) * halfHourHeight);
+  const viewStart = config.startHour * 60;
+  const viewEnd = config.endHour * 60;
 
-        const block = document.createElement("div");
-        block.className = "block";
-        block.style.top = `${topPx}px`;
-        block.style.height = `${heightPx}px`;
-        block.setAttribute("data-tip", b.tip || "");
-        block.innerHTML = `
-            <div class="title">${b.title || "Busy"}</div>
-            <div class="time">${minutesToLabel(timeToMinutes(b.start))} – ${minutesToLabel(timeToMinutes(b.end))}</div>
-        `;
-        col.appendChild(block);
-    });
+  config.blocks.forEach((b) => {
+    if (b.day < 0 || b.day > 6) return;
+    const col = dayCols[b.day]; // Monday=0..Sunday=6 when weekStartsOn=1
+    if (!col) return;
+
+    const startM = timeToMinutes(b.start);
+    const endM = timeToMinutes(b.end);
+
+    // Clamp to visible window so we never overflow
+    const sM = Math.max(viewStart, Math.min(startM, viewEnd));
+    const eM = Math.max(viewStart, Math.min(endM, viewEnd));
+    if (eM <= sM) return; // fully outside
+
+    const relStart = sM - viewStart;
+    const relEnd = eM - viewStart;
+
+    const topPx = (relStart / 30) * halfHourHeight;
+    const heightPx = Math.max(halfHourHeight / 2, ((relEnd - relStart) / 30) * halfHourHeight);
+
+    const block = document.createElement("div");
+    block.className = "block";
+    block.style.top = `${topPx}px`;
+    block.style.height = `${heightPx}px`;
+    block.setAttribute("data-tip", b.tip || "");
+    block.innerHTML = `
+      <div class="title">${b.title || "Busy"}</div>
+      <div class="time">${minsToLabel(startM)} – ${minsToLabel(endM)}</div>
+    `;
+    col.appendChild(block);
+  });
 }
 
-// Helper function to render a line at the current time
-function renderNowLine(grid, startDate, shadowDom, line){
-    const now = getEasternTime();
-    const isThisWeek = (() => {
-        const end = addDays(startDate, 7);
-        return now >= startDate && now < end;
-    })();
+function renderNowLine(grid, startDate, line) {
+  const now = getEasternTime();
 
-    const line = document.getElementById("nowLine");
-    const grid = document.getElementById("calGrid");
-    const hourHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour-height'));
+  // Only show within the rendered week and visible hours
+  const end = addDays(startDate, 7);
+  const withinWeek = now >= startDate && now < end;
 
-    if(!isThisWeek || now.getHours() < config.startHour || now.getHours() >= config.endHour){
-        line.style.setProperty('--now-y', '-9999px');
-        return;
-    }
-    // Vertical position of the current time
-    const minsIntoDay = now.getHours()*60 + now.getMinutes();
-    const minsIntoView = minsIntoDay - config.startHour*60;
-    const y = (minsIntoView/60) * hourHeight;
+  const hourHeight = parseFloat(getComputedStyle(grid).getPropertyValue("--hour-height"));
+  if (!withinWeek || now.getHours() < config.startHour || now.getHours() >= config.endHour) {
+    line.style.setProperty("--now-y", "-9999px");
+    return;
+  }
 
-    // Horizontal width (across day column of "today")
-    const timeColWidth = 72;
-    const colWidth = (grid.clientWidth - timeColWidth) / 7;
-    const offsetX = timeColWidth + (now.getDay() - config.weekStartsOn + 7)%7 * colWidth;
+  // Vertical position
+  const minsIntoDay = now.getHours() * 60 + now.getMinutes();
+  const minsIntoView = minsIntoDay - config.startHour * 60;
+  const y = (minsIntoView / 60) * hourHeight;
+  line.style.setProperty("--now-y", `${y}px`);
 
-    line.style.left = `${offsetX}px`;
-    line.style.right = `${Math.max(0, grid.clientWidth - offsetX - colWidth)}px`;
-    line.style.setProperty('--now-y', `${y}px`);
+  // Horizontal position/width inside the grid
+  const styles = getComputedStyle(grid);
+  const timeColWidth = parseFloat(styles.getPropertyValue("--time-col-width")) || 72;
+  const gridWidth = grid.clientWidth;
+  const colWidth = (gridWidth - timeColWidth) / 7;
+
+  // Map actual weekday (0=Sun) into 0..6 where 0 is weekStartsOn
+  const dayIdx = (now.getDay() - config.weekStartsOn + 7) % 7;
+  const offsetX = timeColWidth + dayIdx * colWidth;
+
+  // Constrain to today's column
+  line.style.left = `${offsetX}px`;
+  line.style.width = `${colWidth}px`;
+  line.style.right = ""; // ensure right doesn't override width
 }
 
-// Helper function to set the inner css of the schedule
-function setCSS(calDiv){
-    // Add a shadow DOM to the calender div
-    const shadow = calDiv.attachShadow({ mode: "open" });
+/* ---------------------------- Shadow/CSS ----------------------------- */
 
-    // Inject the link and html inside of the shadow dom
-    shadow.innerHTML = `
-        <link rel="stylesheet" href="schedule-style.css">
-        <div></div>
-    `
-    return shadow;
+// Create the shadow root and inject the stylesheet; return a promise once loaded
+function setCSS(calDiv) {
+  const shadow = calDiv.attachShadow({ mode: "open" });
+
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "schedule-style.css";
+  shadow.appendChild(link);
+
+  const cssReady = new Promise((resolve) => {
+    if (link.sheet) resolve(); // already in cache
+    else link.addEventListener("load", resolve, { once: true });
+  });
+
+  return { shadow, cssReady };
 }
 
-/** Main schedule function to return a weekly-calender of current office hours */
-export function renderSchedule(){
-    
-    // Extract the current divs from a shadow dom
-    const calDiv = document.getElementById("scheduleDiv");
-    const { shadow: s, cssReady } = setCSS(calDiv);
-    
-    // Create the child elements with classnames matching css file
-    const calendar = document.createElement("div");
-    calendar.id = "calendar";
-    calendar.className = "calendar";
-    
-    const header = document.createElement("div");
-    header.id = "calHeader";
-    header.className = "cal-header";
+/* --------------------------- Main entrypoint ------------------------- */
 
-    const gridWrap = document.createElement("div");
-    gridWrap.id = "gridWrap";
-    gridWrap.className = "scroll-wrap";
+// Render the calendar into #scheduleDiv. Keep signature simple for drop-in use.
+export async function renderSchedule() {
+  const host = document.getElementById("scheduleDiv");
+  if (!host) return;
 
-    const grid = document.createElement("div");
-    grid.id = "calGrid";
-    grid.className = "cal-grid";
+  // Mirror the page theme onto the host for shadow CSS to react
+  const pageTheme = document.documentElement.dataset.theme || "light";
+  host.setAttribute("data-theme", pageTheme);
 
-    const line = document.createElement("div");
-    line.id = "nowLine";
-    line.className = "today-banner";
-    
-    // Add new elements to calender element
-    gridWrap.appendChild(grid);
-    calendar.appendChild(header);
-    calendar.appendChild(gridWrap);
+  const { shadow: s, cssReady } = setCSS(host);
 
-    // Append the calender master element to the shadow dom
-    s.appendChild(calendar);
-    grid.appendChild(line);
+  // Build DOM structure that matches CSS selectors
+  const calendar = document.createElement("div");
+  calendar.className = "calendar";
 
-    const weekStart = startOfWeek(new Date(), config.weekStartsOn); // Get the current week
-    renderHeader(header, weekStart);  // Set the headers
-    renderGrid(grid, weekStart, config.startHour, config.endHour);  // Make the cells of the weekly calender grid
-    placeBlocks(grid, config.startHour);  // Place the currently scheduled office hours
-    renderNowLine(weekStart);  // Place a line at the current time
-    window.addEventListener("resize", () => renderNowLine(weekStart));  // Update now line on window resize
+  const header = document.createElement("div");
+  header.className = "cal-header";
+
+  const gridWrap = document.createElement("div");
+  gridWrap.className = "scroll-wrap";
+
+  const grid = document.createElement("div");
+  grid.className = "cal-grid";
+
+  // The "now" line lives **inside** the grid so it scrolls/alig ns correctly
+  const line = document.createElement("div");
+  line.className = "today-banner";
+
+  gridWrap.appendChild(grid);
+  calendar.appendChild(header);
+  calendar.appendChild(gridWrap);
+  s.appendChild(calendar);
+
+  // Compute week start based on config
+  const weekStart = startOfWeek(new Date(), config.weekStartsOn);
+
+  // Wait for CSS so custom properties are available
+  await cssReady;
+
+  renderHeader(header, weekStart);
+  renderGrid(grid, weekStart, config.startHour, config.endHour);
+
+  // Append now line after grid exists (so child order doesn't confuse queries)
+  grid.appendChild(line);
+
+  placeBlocks(grid);
+  renderNowLine(grid, weekStart, line);
+
+  // Keep the now-line aligned on resize
+  window.addEventListener("resize", () => renderNowLine(grid, weekStart, line));
 }

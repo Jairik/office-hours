@@ -1,5 +1,6 @@
 /* Scripts for the site - handles main functionalities */
 import { getClassList } from './misc/class-list.js'  // Getter for static class-list
+import { renderSchedule } from './schedule.js';
 
 /** Send the message on the contact form */
 export function setupSendEmail(){
@@ -52,4 +53,9 @@ export function setupThemeToggle(){
         localStorage.setItem('theme', newTheme);
         toggleBtn.textContent = newTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
     });
+}
+
+/** Setup the weekly calender */
+export async function setupSchedule(){
+    await renderSchedule();
 }
