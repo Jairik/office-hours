@@ -1,5 +1,5 @@
 /* Style for the schedule calender */
-:root{
+:host{
     --hour-height: 64px;          /* height for 60 minutes */
     --half-hour-height: calc(var(--hour-height) / 2);
     --grid-border: #e5e7eb;       /* light gray */
@@ -10,7 +10,7 @@
     --block-bg: rgba(37, 99, 235, 0.12);
     --block-border: rgba(37, 99, 235, 0.45);
     --tooltip-bg: #111827;
---tooltip-text: #f9fafb;
+    --tooltip-text: #f9fafb;
 }
 
 * { box-sizing: border-box; }
@@ -78,8 +78,8 @@ body{
 
 /* Day columns */
 .day-col{
+    position: relative;  /* required for absolutely positions blocks */
     border-right: 1px solid var(--grid-border);
-    position: relative;
     min-height: 100%;
 }
 .day-col:last-child{ border-right: none; }

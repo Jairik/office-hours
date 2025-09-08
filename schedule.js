@@ -1,12 +1,12 @@
 /* Scripts for updating the current schedule, from the weekly schedule viewer */
 
 /* Basic configuration files - these will be updated on schedule changes */
-// Available office hours
+// Available office hours (assuming monday = 0)
 const officeHours = [
-    {day: 1, start: "17:30", end: "19:30", title: "Office Hours", tip:"TETC111"},  // Monday 5:30pm-7:30pm
-    {day: 2, start: "9:15", end: "10:15", title: "Office Hours", tip:"TETC111"},  // Tuesday 9:15am-10:15am
-    {day: 5, start: "14:00", end: "15:00", title: "Office Hours", tip:"TETC111"},  // Friday 2:00pm-3:00pm
-    {day: 4, start: "9:15", end: "10:15", title: "Office Hours", tip:"TETC111"}  // Thursday 9:15am-10:15am
+    {day: 0, start: "17:30", end: "19:30", title: "Office Hours", tip:"TETC111"},  // Monday 5:30pm-7:30pm
+    {day: 1, start: "9:15", end: "10:15", title: "Office Hours", tip:"TETC111"},  // Tuesday 9:15am-10:15am
+    {day: 4, start: "14:00", end: "15:00", title: "Office Hours", tip:"TETC111"},  // Friday 2:00pm-3:00pm
+    {day: 3, start: "9:15", end: "10:15", title: "Office Hours", tip:"TETC111"}  // Thursday 9:15am-10:15am
 ];
 
 // Configurations for the calender
@@ -30,7 +30,7 @@ function startOfWeek(date, weekStartsOn = 0){
     d.setDate(d.getDate() - diff);
     d.setHours(0,0,0,0);
     return d;
-    }
+}
 
 // Helper function to determine day
 function addDays(date, n){
@@ -41,7 +41,7 @@ function addDays(date, n){
 
 // Helper function to convert time to minutes
 function timeToMinutes(curTime){
-    const [h,m] = time.split(":").map(Number);
+    const [h,m] = curTime.split(":").map(Number);
     return h * 60 + m;
 }
 
@@ -68,7 +68,8 @@ function renderHeader(container, startDate){
         const day = document.createElement("div");
         day.className = "day";
         const md = `${d.getMonth()+1}/${d.getDate()}`;
-        day.innerHTML = `<small>${md}</small>`;
+        const dayName = DAY_NAMES[d.getDay()];
+        day.innerHTML = `${dayName}<small>${md}</small>`;
         container.appendChild(day);
     }
 }
@@ -84,7 +85,7 @@ function renderGrid(grid, startDate, startHour, endHour){
         row.className = "time-slot";
         if(i%2===0){ // on the hour
         const totalMins = (startHour*60) + i*30;
-        row.dataset.time = minutesToLabel(totalMins);
+        row.dataset.time = minsToLabel(totalMins);
         }
         timeCol.appendChild(row);
     }
@@ -112,7 +113,8 @@ function renderGrid(grid, startDate, startHour, endHour){
 
 // Helper function to place each timeslot
 function placeBlocks(grid, startHour){
-    const hourHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour-height'));
+    const hourHeight = parseFloat(getComputedStyle(grid).getPropertyValue('--hour-height'));
+    console.log(hourHeight);
     const halfHourHeight = hourHeight/2;
 
     // Day columns are nodes 1-7
@@ -136,23 +138,21 @@ function placeBlocks(grid, startHour){
         block.setAttribute("data-tip", b.tip || "");
         block.innerHTML = `
             <div class="title">${b.title || "Busy"}</div>
-            <div class="time">${minutesToLabel(timeToMinutes(b.start))} – ${minutesToLabel(timeToMinutes(b.end))}</div>
+            <div class="time">${minsToLabel(timeToMinutes(b.start))} – ${minsToLabel(timeToMinutes(b.end))}</div>
         `;
         col.appendChild(block);
     });
 }
 
 // Helper function to render a line at the current time
-function renderNowLine(startDate){
+function renderNowLine(grid, startDate, shadowDom, line){
     const now = new Date();
     const isThisWeek = (() => {
         const end = addDays(startDate, 7);
         return now >= startDate && now < end;
     })();
 
-    const line = document.getElementById("nowLine");
-    const grid = document.getElementById("calGrid");
-    const hourHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour-height'));
+    const hourHeight = parseFloat(getComputedStyle(grid).getPropertyValue('--hour-height'));
 
     if(!isThisWeek || now.getHours() < config.startHour || now.getHours() >= config.endHour){
         line.style.setProperty('--now-y', '-9999px');
@@ -179,26 +179,64 @@ function setCSS(calDiv){
     const shadow = calDiv.attachShadow({ mode: "open" });
 
     // Inject the link and html inside of the shadow dom
-    shadow.innerHTML = `
-        <link rel="stylesheet" href="schedule-style.css">
-        <div></div>
-    `
-    return shadow;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "schedule-style.css";
+    shadow.appendChild(link);
+
+    // Wait for the CSS to load
+    const cssReady = new Promise(resolve => {
+        if (link.sheet) resolve();
+        else link.addEventListener("load", resolve, {once: true});
+    })
+
+    return { shadow, cssReady };
 }
 
 /** Main schedule function to return a weekly-calender of current office hours */
-export function renderSchedule(){
+export async function renderSchedule(){
     
     // Extract the current divs from a shadow dom
     const calDiv = document.getElementById("scheduleDiv");
-    const s = setCSS(calDiv);
-    const header = s.createElement("div");
-    const grid = s.createElement();
+    const { shadow: s, cssReady } = setCSS(calDiv);
+    
+    // Create the child elements with classnames matching css file
+    const calendar = document.createElement("div");
+    calendar.id = "calendar";
+    calendar.className = "calendar";
+    
+    const header = document.createElement("div");
+    header.id = "calHeader";
+    header.className = "cal-header";
+
+    const gridWrap = document.createElement("div");
+    gridWrap.id = "gridWrap";
+    gridWrap.className = "scroll-wrap";
+
+    const grid = document.createElement("div");
+    grid.id = "calGrid";
+    grid.className = "cal-grid";
+
+    const line = document.createElement("div");
+    line.id = "nowLine";
+    line.className = "today-banner";
+    
+    // Add new elements to calender element
+    gridWrap.appendChild(grid);
+    calendar.appendChild(header);
+    calendar.appendChild(gridWrap);
+    calendar.appendChild(line);
+
+    // Append the calender master element to the shadow dom
+    s.appendChild(calendar);
 
     const weekStart = startOfWeek(new Date(), config.weekStartsOn); // Get the current week
+
+    await cssReady;  // Await for the CSS to properly load
+
     renderHeader(header, weekStart);  // Set the headers
     renderGrid(grid, weekStart, config.startHour, config.endHour);  // Make the cells of the weekly calender grid
     placeBlocks(grid, config.startHour);  // Place the currently scheduled office hours
-    renderNowLine(weekStart);  // Place a line at the current time
-    window.addEventListener("resize", () => renderNowLine(weekStart));  // Update now line on window resize
+    renderNowLine(grid, weekStart, s, line);  // Place a line at the current time
+    window.addEventListener("resize", () => renderNowLine(grid, weekStart, s, line));  // Update now line on window resize
 }

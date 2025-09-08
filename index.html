@@ -29,9 +29,8 @@
         <span>Note: I may have to occasionally change office hours due to scheduling conflicts. Feel free to check back for any week-to-week updates.</span>
     </div>
 
-    <h2>Tentative Office Hours Only - May be subject to change</h2>
     <section id="schedule">
-        <div class="schedule-container">
+        <div class="scheduleDiv" id="scheduleDiv">
             <!-- To be populated by schedule.js -->
         </div>
     </section>
@@ -114,9 +113,10 @@
     <!-- Handle changing the theme-->
     <script type="module">
         import * as utils from './main.js'
-        utils.setupThemeToggle();
-        utils.populateClassList();
-        utils.setupSendEmail();
+        await utils.setupSchedule();  // Populate the schedule weekly calender
+        utils.setupThemeToggle();  // Attach listener to the theme toggle button
+        utils.populateClassList();  // Populate the class list dropdown
+        utils.setupSendEmail();  // Setup the contact form
     </script>
 </body>
 </html>
