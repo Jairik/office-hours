@@ -1,6 +1,6 @@
 # Project TODOs
 - [X] Change highlights to dark green
-- [X] Change from skeleton military to AM/PM Time
+- [ ] Change from skeleton military to AM/PM Time
 - [X] Integrate list into dropdown
 - [X] Add "UPDATE" tab on top
 - [X] Change font
@@ -8,7 +8,7 @@
 - [X] Add resources section - Will add more as I think of them
 - [X] Update README, briefly
 - [X] Add link to github project somewhere, footer probably
-- [] Fix dark/light mode toggle on WSL-Setup Page (and fix some formatting, such as font and add demo picture to top)
+- [ ] Add a brief about me section
 
 # Once Finalized:
 - [ ] Add schedule to calender
