@@ -14,7 +14,7 @@ const config = {
     // Time configs, in military time
     startHour: 8,
     endHour: 20,
-    weekStartsOn: 1,
+    weekStartsOn: 1,  // Start the week on Monday
     blocks: officeHours
 };
 
@@ -56,6 +56,12 @@ function minsToLabel(mins){
     const p = h>=12 ? "pm" : "am";
     const hh = ((h+11)%12)+1;
     return `${hh}${m?":"+pad2(m):""}${p}`
+}
+
+// Helper function to get the current time in EST
+function getEasternTime() {
+    const estString = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+    return new Date(estString);
 }
 
 // Helper function to render the headers of the given div
@@ -112,11 +118,11 @@ function renderGrid(grid, startDate, startHour, endHour){
 
 // Helper function to place each timeslot
 function placeBlocks(grid, startHour){
-    const hourHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hour-height'));
+    const hourHeight = parseFloat(getComputedStyle(grid).getPropertyValue('--hour-height'));
     const halfHourHeight = hourHeight/2;
 
-    // Day columns are nodes 1-7
-    const dayCols = [...grid.children].slice(1);
+    // Grab the day columns
+    const dayCols = Array.from(grid.querySelectorAll('.day-col'));
 
     // Place each block
     config.blocks.forEach(b=>{
@@ -143,8 +149,8 @@ function placeBlocks(grid, startHour){
 }
 
 // Helper function to render a line at the current time
-function renderNowLine(startDate){
-    const now = new Date();
+function renderNowLine(grid, startDate, shadowDom, line){
+    const now = getEasternTime();
     const isThisWeek = (() => {
         const end = addDays(startDate, 7);
         return now >= startDate && now < end;
@@ -191,9 +197,37 @@ export function renderSchedule(){
     
     // Extract the current divs from a shadow dom
     const calDiv = document.getElementById("scheduleDiv");
-    const s = setCSS(calDiv);
-    const header = s.createElement("div");
-    const grid = s.createElement();
+    const { shadow: s, cssReady } = setCSS(calDiv);
+    
+    // Create the child elements with classnames matching css file
+    const calendar = document.createElement("div");
+    calendar.id = "calendar";
+    calendar.className = "calendar";
+    
+    const header = document.createElement("div");
+    header.id = "calHeader";
+    header.className = "cal-header";
+
+    const gridWrap = document.createElement("div");
+    gridWrap.id = "gridWrap";
+    gridWrap.className = "scroll-wrap";
+
+    const grid = document.createElement("div");
+    grid.id = "calGrid";
+    grid.className = "cal-grid";
+
+    const line = document.createElement("div");
+    line.id = "nowLine";
+    line.className = "today-banner";
+    
+    // Add new elements to calender element
+    gridWrap.appendChild(grid);
+    calendar.appendChild(header);
+    calendar.appendChild(gridWrap);
+
+    // Append the calender master element to the shadow dom
+    s.appendChild(calendar);
+    grid.appendChild(line);
 
     const weekStart = startOfWeek(new Date(), config.weekStartsOn); // Get the current week
     renderHeader(header, weekStart);  // Set the headers
