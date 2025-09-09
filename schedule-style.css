@@ -1,34 +1,42 @@
 /* schedule-style.css
-   Styles scoped to the Shadow DOM host (the element with id="scheduleDiv")
-   Variables define the theme; dark mode uses :host([data-theme="dark"])
+   Styles scoped to the Shadow DOM host (#scheduleDiv as the :host)
 */
 
 /* ---------- Theme variables (Light) ---------- */
 :host {
-  --hour-height: 64px;                  /* height for 60 minutes */
+  /* sizing */
+  --hour-height: 64px;                          /* height for 60 minutes */
   --half-hour-height: calc(var(--hour-height) / 2);
-  --time-col-width: 72px;               /* width of the time axis column */
-  --grid-border: #e5e7eb;
+  --time-col-width: 72px;                       /* width of the time axis column */
+
+  /* grid lines */
+  --grid-border: #e5e7eb;                       /* half-hour line color */
+  --hour-line:  #8c8f93;                        /* hour line color */
+
+  /* colors */
   --bg: #ffffff;
   --text: #111827;
   --muted: #6b7280;
-  --primary: #5D1725;                   /* maroon line for "now" */
-  --block-bg: rgba(93, 23, 37, 0.12);   /* maroon tint */
+  --primary: #5D1725;                           /* maroon "now" line / accents */
+  --block-bg: rgba(93, 23, 37, 0.12);
   --block-border: rgba(93, 23, 37, 0.45);
   --tooltip-bg: #111827;
   --tooltip-text: #f9fafb;
 }
 
 /* ---------- Dark theme overrides ---------- */
- :host([data-theme="dark"]),
- :host-context([data-theme="dark"]) {
-  --bg: #0b0b0c;
+:host([data-theme="dark"]),
+:host-context([data-theme="dark"]) {
+  --bg: #121212;
   --text: #e7e7ea;
   --muted: #a0a3a8;
+
   --grid-border: #2a2c31;
-  --primary: #e2a2ad;
+  --hour-line:  #484c53;
+
+  --primary: #ffffff;
   --block-bg: rgba(226, 162, 173, 0.14);
-  --block-border: rgba(226, 162, 173, 0.5);
+  --block-border: rgba(226, 162, 173, 0.69);
   --tooltip-bg: #0f1012;
   --tooltip-text: #f2f4f6;
 }
@@ -55,12 +63,10 @@
   border-bottom: 1px solid var(--grid-border);
   padding: 10px 0;
 }
-
 .cal-header .day {
   text-align: center;
   font-weight: 600;
 }
-
 .cal-header .day small {
   display: block;
   color: var(--muted);
@@ -76,13 +82,49 @@
 .cal-grid {
   display: grid;
   grid-template-columns: var(--time-col-width) repeat(7, 1fr);
-  position: relative; /* containing block for the "now" line */
+  position: relative; /* anchor for ::before grid lines and the now-line */
+  z-index: 0;
 }
 
-/* ---------- Time axis ---------- */
+/* ---------- Centralized horizontal grid lines (ONLY over day columns) ---------- */
+/* This paints both the hour and half-hour lines once, clipped to the area
+   that starts AFTER the time column. Nothing bleeds into the time axis. */
+.cal-grid::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--time-col-width);                   /* start after time column */
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    /* hour line every full hour */
+    repeating-linear-gradient(
+      to bottom,
+      var(--hour-line) 0,
+      var(--hour-line) 1px,
+      transparent 1px,
+      transparent var(--hour-height)
+    ),
+    /* half-hour line */
+    repeating-linear-gradient(
+      to bottom,
+      var(--grid-border) 0,
+      var(--grid-border) 1px,
+      transparent 1px,
+      transparent var(--half-hour-height)
+    );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* ---------- Time axis (left column) ---------- */
 
 .time-col {
   border-right: 1px solid var(--grid-border);
+  /* IMPORTANT: no backgrounds here, so lines do NOT appear in the time column */
+  background: none;
 }
 
 .time-slot {
@@ -91,47 +133,49 @@
   text-align: right;
   color: var(--muted);
   font-size: 12px;
-  position: relative; /* position labels inside the row */
+  position: relative; /* for the hour label */
 }
 
-/* Hour labels on the top edge of each hour row (i.e., every odd 30-min row) */
+/* Hour labels on top edge of each hour row (odd 30-min rows: 1st, 3rd, …) */
 .time-slot:nth-child(odd)::after {
   content: attr(data-time);
   position: absolute;
   right: 8px;
-  top: 0;                   /* anchor to top border of the row */
-  transform: translateY(-50%); /* sit on the hour line */
+  top: 0;                          /* sits on the hour line */
+  transform: translateY(-50%);     /* hug the painted line */
 }
+/* Hide the very first label to avoid crowding the top border */
+.time-slot:first-child::after { content: none; }
 
-/* Hide the first label to avoid crowding the top border */
-.time-slot:first-child::after {
-  content: none;
-}
-
-/* ---------- Day columns ---------- */
+/* ---------- Day columns (7 right-hand columns) ---------- */
 
 .day-col {
-  position: relative; /* containing block for .block items */
+  position: relative;              /* containing block for .block items */
   border-right: 1px solid var(--grid-border);
   min-height: 100%;
+  background: none;                /* IMPORTANT: lines are painted on .cal-grid::before */
 }
+.day-col:last-child { border-right: none; }
 
-.day-col:last-child {
-  border-right: none;
-}
+/* Rows are pure spacers (no borders = no cumulative drift) */
+.day-col .slot { height: var(--half-hour-height); }
 
-/* Half-hour separators */
-.day-col .slot {
-  height: var(--half-hour-height);
-  border-bottom: 1px solid var(--grid-border);
-}
-.day-col .slot:nth-child(odd) {
-  border-bottom-color: #8c8f93; /* slightly darker on the hour */
+/* Subtle "today" tint (doesn't affect line painting) */
+.day-col.is-today {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(93, 23, 37, 0.06),
+    rgba(93, 23, 37, 0.06)
+  );
+  background-size: 100% var(--half-hour-height);
+  background-repeat: no-repeat;
+  background-position-y: calc((var(--now-offset, 0)) * 1px);
 }
 
 /* ---------- Event Blocks ---------- */
 
 .block {
+  box-sizing: border-box;
   position: absolute;
   left: 6px;
   right: 6px;
@@ -142,13 +186,12 @@
   overflow: hidden;
   cursor: default;
   transition: box-shadow 120ms ease, transform 120ms ease;
+  z-index: 1;                      /* sit above the grid lines */
 }
-
 .block:hover {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
-
 .block .title {
   font-weight: 600;
   font-size: 13px;
@@ -156,9 +199,8 @@
   color: var(--primary);
   font-style: italic;
 }
-
 .block .time {
-  font-size: 12px;
+  font-size: 9px;
   color: var(--muted);
 }
 
@@ -180,7 +222,6 @@
   pointer-events: none;
   z-index: 10;
 }
-
 .block[data-tip]:hover::before {
   content: "";
   position: absolute;
@@ -193,23 +234,16 @@
   z-index: 10;
 }
 
-/* ---------- Today highlight & Now line ---------- */
-
-.day-col.is-today .slot {
-  background-image: linear-gradient(to bottom, rgba(93, 23, 37, 0.06), rgba(93, 23, 37, 0.06));
-  background-size: 100% var(--half-hour-height);
-  background-repeat: no-repeat;
-  background-position-y: calc((var(--now-offset, 0)) * 1px);
-}
-
+/* ---------- Now line ---------- */
+/* JS sets --now-y (vertical translate), as well as left/width in JS */
 .today-banner {
   position: absolute;
   top: 0;
-  left: 0;               /* JS sets left and width */
-  width: 0;
+  left: 0;                          /* JS overrides left */
+  width: 0;                         /* JS sets width to one column */
   height: 2px;
   background: var(--primary);
-  transform: translateY(var(--now-y, -9999px)); /* JS sets --now-y */
+  transform: translateY(var(--now-y, -9999px));
   z-index: 3;
   pointer-events: none;
 }

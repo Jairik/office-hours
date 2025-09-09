@@ -1,6 +1,6 @@
 # Project TODOs
 - [X] Change highlights to dark green
-- [ ] Change from skeleton military to AM/PM Time
+- [X] Change from skeleton military to AM/PM Time
 - [X] Integrate list into dropdown
 - [X] Add "UPDATE" tab on top
 - [X] Change font
@@ -12,7 +12,6 @@
 
 # Once Finalized:
 - [ ] Add schedule to calender
-        -> [ ] Update README with finalized website screenshot
 
 # Deployment
 - [X] Deploy via Github Pages

@@ -122,42 +122,46 @@ function renderGrid(grid, startDate, startHour, endHour) {
   }
 }
 
-function placeBlocks(grid) {
-  const hourHeight = parseFloat(getComputedStyle(grid).getPropertyValue("--hour-height"));
+function placeBlocks(grid){
+  const hourHeight = parseFloat(getComputedStyle(grid).getPropertyValue('--hour-height'));
   const halfHourHeight = hourHeight / 2;
 
-  // select only the .day-col nodes (robust even if other children exist)
-  const dayCols = Array.from(grid.querySelectorAll(".day-col"));
+  const dayCols = Array.from(grid.querySelectorAll('.day-col'));
+
+  // Map “Monday=0..Sunday=6” into the grid index depending on weekStartsOn
+  const offset = (7 + (1 - config.weekStartsOn)) % 7;
 
   const viewStart = config.startHour * 60;
-  const viewEnd = config.endHour * 60;
+  const viewEnd   = config.endHour * 60;
 
-  config.blocks.forEach((b) => {
+  config.blocks.forEach(b => {
     if (b.day < 0 || b.day > 6) return;
-    const col = dayCols[b.day]; // Monday=0..Sunday=6 when weekStartsOn=1
+
+    const idx = (b.day + offset) % 7;
+    const col = dayCols[idx];
     if (!col) return;
 
     const startM = timeToMinutes(b.start);
-    const endM = timeToMinutes(b.end);
+    const endM   = timeToMinutes(b.end);
 
-    // Clamp to visible window so we never overflow
+    // clamp to visible window
     const sM = Math.max(viewStart, Math.min(startM, viewEnd));
     const eM = Math.max(viewStart, Math.min(endM, viewEnd));
-    if (eM <= sM) return; // fully outside
+    if (eM <= sM) return;
 
     const relStart = sM - viewStart;
-    const relEnd = eM - viewStart;
+    const relEnd   = eM - viewStart;
 
-    const topPx = (relStart / 30) * halfHourHeight;
+    const topPx    = (relStart / 30) * halfHourHeight;
     const heightPx = Math.max(halfHourHeight / 2, ((relEnd - relStart) / 30) * halfHourHeight);
 
-    const block = document.createElement("div");
-    block.className = "block";
+    const block = document.createElement('div');
+    block.className = 'block';
     block.style.top = `${topPx}px`;
     block.style.height = `${heightPx}px`;
-    block.setAttribute("data-tip", b.tip || "");
+    block.setAttribute('data-tip', b.tip || '');
     block.innerHTML = `
-      <div class="title">${b.title || "Busy"}</div>
+      <div class="title">${b.title || 'Busy'}</div>
       <div class="time">${minsToLabel(startM)} – ${minsToLabel(endM)}</div>
     `;
     col.appendChild(block);

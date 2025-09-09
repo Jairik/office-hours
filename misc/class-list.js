@@ -27,7 +27,7 @@ export const classList = [
     "DSCI218 - Intro to Data Science X",
     "DSCI470 - Research Methods in Data Science ~",
     "DSCI490 - Capstone Project X",
-    "Other/misc question"
+    "Other"
 ];
 
 /** Helper function - getter */
