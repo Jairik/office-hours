@@ -9,10 +9,11 @@
 
 // Example office hours. With weekStartsOn=1 (Mon), use Monday=0 .. Sunday=6.
 const officeHours = [
-  { day: 0, start: "17:30", end: "19:30", title: "Office Hours", tip: "TETC111" }, // Mon
-  { day: 1, start: "09:15", end: "10:15", title: "Office Hours", tip: "TETC111" }, // Tue
-  { day: 3, start: "09:15", end: "10:15", title: "Office Hours", tip: "TETC111" }, // Thu
-  { day: 4, start: "14:00", end: "15:00", title: "Office Hours", tip: "TETC111" }, // Fri
+  { day: 0, start: "11:50", end: "12:50", title: "Office Hours", tip: "TETC111" }, // Mon
+  //{ day: 1, start: "09:15", end: "10:15", title: "Office Hours", tip: "TETC111" }, // Tue
+  { day: 2, start: "11:50", end: "12:50", title: "Office Hours", tip: "TETC111" }, // Thu
+  { day: 3, start: "11:00", end: "12:40", title: "In Lab (COSC350)", tip: "HS143" }, // Thu
+  { day: 3, start: "13:00", end: "15:00", title: "Office Hours", tip: "TETC111" }, // Fri
 ];
 
 // Calendar config

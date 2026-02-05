@@ -20,13 +20,13 @@ export const classList = [
     "COSC362 - Theory of Computation ✓",
     "COSC386 - Database Design and Implementation ✓",
     "COSC411 - Artificial Intelligence ✓",
-    "COSC420 - High-Performance Computing ~",
+    "COSC420 - High-Performance Computing ✓",
     "COSC425/426 - Software Engineering ✓",
     "COSC450 - Operating Systems ✓",
     "COSC490 - Special Topics: Convolutional Neural Nets X",
-    "DSCI218 - Intro to Data Science X",
-    "DSCI470 - Research Methods in Data Science ~",
-    "DSCI490 - Capstone Project X",
+    "DSCI218 - Intro to Data Science ✓",
+    "DSCI470 - Research Methods in Data Science ✓",
+    "DSCI490 - Capstone Project ~",
     "Other"
 ];
 
